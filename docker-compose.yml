@@ -1,0 +1,64 @@
+# Local development: four containers. Production uses the root Dockerfile instead.
+name: personal-tracker
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # A fake mail server: catches every email the app sends. Inbox UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_test
+      EMAIL_PROVIDER: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_STARTTLS: "false"
+      # File-change detection on Windows/macOS bind mounts needs polling.
+      WATCHFILES_FORCE_POLLING: "true"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_PROXY_TARGET: http://backend:8000
+      VITE_USE_POLLING: "true"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
