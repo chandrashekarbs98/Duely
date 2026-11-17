@@ -424,6 +424,12 @@ taken), 422 (validation), 429 (rate limit), 503 (email provider/database down).
 remembering where you were going.
 
 ### Details worth noticing
+- **Code splitting**: the charts page is loaded with `React.lazy` ([DashboardPage.tsx](../frontend/src/pages/DashboardPage.tsx)),
+  so the chart library (~110 kB gzipped) downloads only when someone opens Charts. That cut the
+  first download from 722 kB to 334 kB.
+- **Modal focus**: `showModal()` focuses the first button (×); [ui.tsx](../frontend/src/components/ui.tsx)
+  then moves focus to the field marked `data-autofocus`, so you can type straight away. (A bug
+  found by clicking through the real app, not by unit tests: a good reason to do both.)
 - **Search debounce** (`useDebounced`): wait 300 ms after typing stops before calling the API.
 - **Dates** ([lib/dates.ts](../frontend/src/lib/dates.ts)): `new Date("2026-03-15")` is UTC
   midnight and can display as the 14th in some time zones, so we parse the parts manually.
