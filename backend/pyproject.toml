@@ -1,0 +1,51 @@
+[project]
+name = "tracker-backend"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "email-validator>=2.1",
+    "sqlalchemy>=2.0.30",
+    "psycopg[binary]>=3.2",
+    "alembic>=1.13",
+    "pyjwt>=2.8",
+    "bcrypt>=4.1",
+    "httpx>=0.27",   # the Brevo email API call
+    "tzdata",        # time-zone database for zoneinfo on slim images
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx2>=2.13",  # Starlette's TestClient transport (the recommended successor to httpx)
+    "ruff>=0.5",
+    "black>=24",
+]
+
+# Only "app" is a package; alembic/ and tests/ are not installed.
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# FastAPI's Depends()/Query() in defaults is the documented pattern.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+known-third-party = ["alembic"]
