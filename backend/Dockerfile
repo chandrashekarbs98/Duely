@@ -7,7 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY pyproject.toml .
-RUN mkdir app && pip install --no-cache-dir ".[dev]"
+# Only the dependencies are installed here; the code itself is mounted at /app at runtime.
+RUN pip install --no-cache-dir ".[dev]"
 
 COPY . .
 

@@ -1,0 +1,30 @@
+# The "alarm clock" for email reminders. Every morning GitHub Actions calls the app's
+# protected endpoint, and the app emails each opted-in user their digest.
+#
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   APP_URL      e.g. https://personal-tracker.onrender.com
+#   CRON_SECRET  the same value as CRON_SECRET on Render
+name: Daily reminders
+
+on:
+  schedule:
+    - cron: "30 2 * * *" # 02:30 UTC = 08:00 in India. GitHub may run it a few minutes late.
+  workflow_dispatch: # adds a "Run workflow" button for manual testing
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reminder run
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "APP_URL / CRON_SECRET secrets are not set yet; skipping."
+            exit 0
+          fi
+          # The free Render instance sleeps when idle; the first request wakes it (up to ~1 min).
+          curl --fail-with-body --silent --show-error --max-time 120 --retry 3 --retry-delay 20 \
+            -X POST "$APP_URL/api/internal/reminders/run" \
+            -H "X-Cron-Secret: $CRON_SECRET"

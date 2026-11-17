@@ -1,0 +1,40 @@
+# Render "Blueprint": infrastructure as code. Render reads this file when you create a
+# Blueprint from the GitHub repo, and creates the web service described here.
+# Database: Neon (free Postgres) — paste its connection string into DATABASE_URL.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: personal-tracker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false # you paste the Neon URL in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true # Render generates a random secret once
+      - key: CRON_SECRET
+        sync: false # must match the GitHub Actions secret of the same name
+      - key: APP_URL
+        sync: false # e.g. https://personal-tracker.onrender.com
+      - key: FRONTEND_ORIGIN
+        sync: false # same value as APP_URL
+      - key: CURRENCY
+        value: INR
+      - key: APP_TIMEZONE
+        value: Asia/Kolkata
+      - key: EMAIL_PROVIDER
+        value: brevo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM_ADDRESS
+        sync: false # a sender address you verified in Brevo
+      - key: EMAIL_FROM_NAME
+        value: Personal Tracker
