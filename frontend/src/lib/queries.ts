@@ -5,7 +5,7 @@
 // always correct; React Query refetches only what is currently on screen.
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ME_KEY } from "../auth/AuthProvider";
+import { ME_KEY } from "../auth/session";
 
 export function useInvalidateData() {
   const queryClient = useQueryClient();

@@ -5,8 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 import { ApiError, api } from "../api/client";
 import type { LoginInput, RegisterInput, User } from "../api/types";
-
-export const ME_KEY = ["me"] as const;
+import { ME_KEY, forgetUser } from "./session";
 
 async function fetchMe(): Promise<User | null> {
   try {
@@ -55,9 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     await api.logout();
-    queryClient.clear(); // drop every cached response that belonged to this user
-    setUser(null);
-  }, [queryClient, setUser]);
+    forgetUser(queryClient); // "me" → null first, then drop the rest (see session.ts)
+  }, [queryClient]);
 
   const value = useMemo<AuthValue>(
     () => ({ user: data ?? null, loading: isPending, login, register, logout, setUser }),

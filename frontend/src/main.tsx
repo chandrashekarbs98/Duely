@@ -4,7 +4,8 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { ApiError } from "./api/client";
 import App from "./App";
-import { AuthProvider, ME_KEY } from "./auth/AuthProvider";
+import { AuthProvider } from "./auth/AuthProvider";
+import { ME_KEY } from "./auth/session";
 import { ThemeProvider } from "./lib/theme";
 import "./styles.css";
 

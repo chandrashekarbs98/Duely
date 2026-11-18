@@ -279,6 +279,13 @@ asks `GET /api/auth/me`: 200 = logged in, 401 = not. [RouteGuards.tsx](../fronte
 redirects accordingly. A global handler in [main.tsx](../frontend/src/main.tsx) treats *any* 401
 as "logged out", which handles expired cookies.
 
+**Logging out** ([session.ts](../frontend/src/auth/session.ts)) is order-sensitive. The server
+deletes the cookie, then the app sets the cached "me" to `null` *first* (the route guard swaps the
+private pages for a redirect) and only then drops the rest of the cache. An earlier version
+cleared the whole cache at once, which also removed "me": the Home page, still on screen,
+re-fetched its data without a cookie and showed "Not authenticated." instead of logging out.
+Lesson: with a client cache, *what you remove and in which order* decides what re-renders.
+
 **Check yourself:** Why is a token in localStorage riskier than in an httpOnly cookie? What stops
 a user editing their JWT to become user 1? What does `SameSite=Lax` protect against?
 
