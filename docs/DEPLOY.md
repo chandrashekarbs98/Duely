@@ -111,6 +111,9 @@ Put the demo login in your README so recruiters can click around.
 - [ ] No secrets in the diff (`git diff --cached | grep -i secret`).
 - [ ] After deploy: `GET /api/health` returns `{"status":"ok","database":"ok"}`.
 - [ ] Log in, create a to-do and a finance entry, check Home.
+- [ ] First deploy only: Render → **Logs** shows no `Header True-Client-IP missing` warning
+      after a login. (If it does, rate limits are using the proxy's address: check with
+      Render support which header carries the visitor IP and set `CLIENT_IP_HEADER`.)
 - [ ] Rollback plan: Render → **Events** → redeploy the previous successful deploy.
 
 ## Environment variables (complete list)
@@ -119,9 +122,10 @@ Put the demo login in your README so recruiters can click around.
 |------|----------|---------|---------|
 | `DATABASE_URL` | yes | – | Postgres connection |
 | `JWT_SECRET` | yes | – | Signs login tokens (≥ 32 chars) |
-| `ENVIRONMENT` | prod | `development` | `production` turns on `Secure` cookies |
+| `ENVIRONMENT` | prod | `development` | `production` turns on `Secure` cookies, HSTS, and hides `/docs` |
 | `APP_URL` | prod | `http://localhost:5173` | Links inside emails |
 | `FRONTEND_ORIGIN` | prod | `http://localhost:5173` | CORS allow-list |
+| `CLIENT_IP_HEADER` | prod | unset (connection address) | Header with the visitor's real IP, for rate limits. `True-Client-IP` on Render (set in render.yaml). Never `X-Forwarded-For` |
 | `CRON_SECRET` | for reminders | – | Protects the daily job endpoint |
 | `EMAIL_PROVIDER` | for email | `console` | `console`, `smtp` or `brevo` |
 | `BREVO_API_KEY` | if brevo | – | Brevo API key |

@@ -41,7 +41,8 @@ def main() -> None:
             users.delete(existing)  # cascade removes old demo data
         auth = AuthService(users)
         user, _ = auth.register(
-            RegisterRequest(email=args.email, password=password, name=args.name)
+            RegisterRequest(email=args.email, password=password, name=args.name),
+            client_ip="seed-script",  # a one-off command, not a visitor
         )
         auth.update_profile(user, UserUpdate(monthly_budget=Decimal("40000.00")))
 

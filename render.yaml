@@ -16,6 +16,8 @@ services:
     envVars:
       - key: ENVIRONMENT
         value: production
+      - key: CLIENT_IP_HEADER
+        value: True-Client-IP # set by Cloudflare in front of Render; can't be spoofed
       - key: DATABASE_URL
         sync: false # you paste the Neon URL in the Render dashboard
       - key: JWT_SECRET

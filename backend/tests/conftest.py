@@ -21,7 +21,7 @@ from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_db
 from app.core.email import Email, get_email_sender
-from app.core.rate_limit import login_limiter
+from app.core.rate_limit import clear_all as clear_rate_limits
 from app.main import app
 
 PASSWORD = "correct-horse-battery"
@@ -83,10 +83,10 @@ def outbox() -> FakeSender:
 def _overrides(db: Session, outbox: FakeSender) -> Iterator[None]:
     app.dependency_overrides[get_db] = lambda: db
     app.dependency_overrides[get_email_sender] = lambda: outbox
-    login_limiter.clear()
+    clear_rate_limits()
     yield
     app.dependency_overrides.clear()
-    login_limiter.clear()
+    clear_rate_limits()
 
 
 @pytest.fixture

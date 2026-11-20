@@ -8,7 +8,8 @@ from datetime import date, timedelta
 from app.core import clock
 from app.core.config import get_settings
 from app.core.email import Email, EmailSender
-from app.core.errors import ServiceUnavailableError
+from app.core.errors import ServiceUnavailableError, TooManyRequestsError
+from app.core.rate_limit import test_email_cooldown, test_emails_global, test_emails_per_user
 from app.models import FinanceEntry, Todo, User
 from app.repositories.finance import FinanceRepository
 from app.repositories.todo import TodoRepository
@@ -136,6 +137,16 @@ class ReminderService:
         )
 
     def send_test_digest(self, user: User) -> str:
+        # Each test email is real and paid for from the Brevo quota, and sign-up does not
+        # prove you own the address. Without limits, anyone could register a stranger's
+        # email and press the button in a loop: spam sent in our name, quota gone.
+        key = str(user.id)
+        if not test_email_cooldown.try_acquire(key):
+            raise TooManyRequestsError("You can send one test email every 10 minutes.")
+        if not test_emails_per_user.try_acquire(key):
+            raise TooManyRequestsError("You've sent 5 test emails today. Try again tomorrow.")
+        if not test_emails_global.try_acquire("all"):
+            raise TooManyRequestsError("Test emails are paused for today. Try again tomorrow.")
         self.sender.send(self._digest_email(user, self.reminders(user)))
         return user.email
 

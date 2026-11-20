@@ -3,6 +3,7 @@
 Depends() builds these per request. Tests swap any of them with app.dependency_overrides.
 """
 
+import logging
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -24,6 +25,8 @@ from app.services.home import HomeService
 from app.services.reminders import ReminderService
 from app.services.todo import TodoService
 
+logger = logging.getLogger(__name__)
+
 DbSession = Annotated[Session, Depends(get_db)]
 
 
@@ -38,6 +41,20 @@ def get_current_user(request: Request, db: DbSession) -> User:
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def get_client_ip(request: Request) -> str:
+    """The visitor's IP, for per-IP rate limits. See Settings.client_ip_header."""
+    header = get_settings().client_ip_header
+    if header:
+        value = request.headers.get(header, "").strip()
+        if value:
+            return value
+        logger.warning("Header %s missing; rate limiting by connection address", header)
+    return request.client.host if request.client else "unknown"
+
+
+ClientIP = Annotated[str, Depends(get_client_ip)]
 
 
 def get_auth_service(db: DbSession) -> AuthService:

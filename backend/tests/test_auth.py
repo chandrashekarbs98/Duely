@@ -1,5 +1,7 @@
+import pytest
 from fastapi.testclient import TestClient
 
+from app.core.config import get_settings
 from app.core.security import create_access_token
 from tests.conftest import PASSWORD, register
 
@@ -81,6 +83,53 @@ def test_login_is_rate_limited_after_five_failures(anon: TestClient) -> None:
         assert anon.post("/api/auth/login", json=bad).status_code == 401
     good = anon.post("/api/auth/login", json={"email": "target@example.com", "password": PASSWORD})
     assert good.status_code == 429
+
+
+def test_login_is_rate_limited_per_ip_across_emails(anon: TestClient) -> None:
+    # Password spraying: one common password tried against many different accounts.
+    for i in range(20):
+        bad = {"email": f"victim{i}@example.com", "password": "Summer2026!"}
+        assert anon.post("/api/auth/login", json=bad).status_code == 401
+    bad = {"email": "victim99@example.com", "password": "Summer2026!"}
+    assert anon.post("/api/auth/login", json=bad).status_code == 429
+
+
+def test_signups_are_rate_limited_per_ip(anon: TestClient) -> None:
+    for i in range(5):
+        register(anon, f"new{i}@example.com")
+    sixth = anon.post(
+        "/api/auth/register",
+        json={"email": "new5@example.com", "password": PASSWORD, "name": "Six"},
+    )
+    assert sixth.status_code == 429
+
+
+def test_client_ip_comes_from_the_configured_header(
+    anon: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(get_settings(), "client_ip_header", "True-Client-IP")
+    body = {"password": PASSWORD, "name": "Visitor"}
+    for i in range(5):
+        response = anon.post(
+            "/api/auth/register",
+            json={**body, "email": f"a{i}@example.com"},
+            headers={"True-Client-IP": "203.0.113.1"},
+        )
+        assert response.status_code == 201
+    # Same visitor: blocked, even if they put a fake IP in X-Forwarded-For.
+    spoofed = anon.post(
+        "/api/auth/register",
+        json={**body, "email": "a5@example.com"},
+        headers={"True-Client-IP": "203.0.113.1", "X-Forwarded-For": "198.51.100.7"},
+    )
+    assert spoofed.status_code == 429
+    # A different visitor is not affected.
+    other = anon.post(
+        "/api/auth/register",
+        json={**body, "email": "b0@example.com"},
+        headers={"True-Client-IP": "203.0.113.2"},
+    )
+    assert other.status_code == 201
 
 
 def test_me_requires_a_valid_token(anon: TestClient) -> None:

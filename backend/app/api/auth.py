@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, status
 
 from app.core.config import get_settings
-from app.core.deps import CurrentUser, get_auth_service
+from app.core.deps import ClientIP, CurrentUser, get_auth_service
 from app.models import User
 from app.schemas.auth import LoginRequest, MeResponse, RegisterRequest, UserRead, UserUpdate
 from app.services.auth import AuthService
@@ -32,15 +32,17 @@ def _me(user: User) -> MeResponse:
 
 
 @router.post("/register", response_model=MeResponse, status_code=status.HTTP_201_CREATED)
-def register(data: RegisterRequest, response: Response, service: Service) -> MeResponse:
-    user, token = service.register(data)
+def register(
+    data: RegisterRequest, response: Response, service: Service, ip: ClientIP
+) -> MeResponse:
+    user, token = service.register(data, ip)
     _set_auth_cookie(response, token)
     return _me(user)
 
 
 @router.post("/login", response_model=MeResponse)
-def login(data: LoginRequest, response: Response, service: Service) -> MeResponse:
-    user, token = service.login(data)
+def login(data: LoginRequest, response: Response, service: Service, ip: ClientIP) -> MeResponse:
+    user, token = service.login(data, ip)
     _set_auth_cookie(response, token)
     return _me(user)
 

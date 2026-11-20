@@ -68,7 +68,10 @@ FinanceEntry
 - Register (logs you in), login, logout, me, update profile, delete account.
 - bcrypt password hashing. Password 8–72 bytes.
 - JWT in an httpOnly cookie: `SameSite=Lax`, `Secure` in production, 24-hour expiry. No refresh token.
-- Login rate limit: 5 failed attempts per email per 15 minutes → 429.
+- Rate limits (→ 429): failed logins 5 per email and 20 per IP per 15 minutes; sign-ups 5 per IP
+  per hour; test email 1 per 10 minutes and 5 per day per user, 100 per day for the whole app.
+- Request bodies over 64 KB → 413; chunked bodies without a length → 411.
+- Production: Content-Security-Policy, HSTS, and no `/docs` or `/openapi.json`.
 
 **FR2 — Data isolation**
 - Every todo/finance query is filtered by the current user.

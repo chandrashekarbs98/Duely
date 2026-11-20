@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     app_timezone: str = "Asia/Kolkata"
     # Production only: folder holding the built React app, served by FastAPI.
     static_dir: str | None = None
+    # Header that holds the visitor's real IP, set by the host's proxy (used for rate
+    # limits). Render sits behind Cloudflare, which sets True-Client-IP and overwrites any
+    # value the visitor sends. Never use X-Forwarded-For here: on Render a visitor can
+    # put any IP at its start. Unset (local dev) = the address of the direct connection.
+    client_ip_header: str | None = None
 
     # Reminders / email
     cron_secret: str | None = None

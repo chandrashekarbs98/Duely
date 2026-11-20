@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import get_settings
+from app.core.rate_limit import test_email_cooldown, test_emails_global
 from tests.conftest import FakeSender
 
 Make = Callable[..., dict[str, Any]]
@@ -56,6 +57,40 @@ def test_test_email_goes_to_current_user_and_escapes_html(
     assert "<script>" not in email.html
     assert "&lt;script&gt;" in email.html
     assert "To-dos due today" in email.text
+
+
+def test_test_email_has_a_cooldown_per_user(
+    client: TestClient, client_b: TestClient, outbox: FakeSender
+) -> None:
+    assert client.post("/api/reminders/test-email").status_code == 200
+    again = client.post("/api/reminders/test-email")
+    assert again.status_code == 429
+    assert "10 minutes" in again.json()["detail"]
+    # Another user has their own cooldown.
+    assert client_b.post("/api/reminders/test-email").status_code == 200
+    assert len(outbox.sent) == 2
+
+
+def test_test_email_daily_cap_per_user(client: TestClient, outbox: FakeSender) -> None:
+    for _ in range(5):
+        test_email_cooldown.clear()  # skip the 10-minute wait
+        assert client.post("/api/reminders/test-email").status_code == 200
+    test_email_cooldown.clear()
+    sixth = client.post("/api/reminders/test-email")
+    assert sixth.status_code == 429
+    assert "tomorrow" in sixth.json()["detail"]
+    assert len(outbox.sent) == 5
+
+
+def test_test_email_global_cap(
+    client: TestClient, client_b: TestClient, outbox: FakeSender, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(test_emails_global, "max_events", 1)
+    assert client.post("/api/reminders/test-email").status_code == 200
+    paused = client_b.post("/api/reminders/test-email")
+    assert paused.status_code == 429
+    assert "paused" in paused.json()["detail"]
+    assert len(outbox.sent) == 1
 
 
 def test_run_is_hidden_when_no_secret_configured(
