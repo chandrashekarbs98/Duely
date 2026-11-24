@@ -1,4 +1,4 @@
-# Personal Tracker — Study Guide
+# Duely — Study Guide
 
 This guide explains **how the app is built and why**. Read it top to bottom once, then use it as a
 reference. File paths are clickable in most editors. Each section ends with **Check yourself**

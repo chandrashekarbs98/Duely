@@ -1,5 +1,5 @@
 # Local development: four containers. Production uses the root Dockerfile instead.
-name: personal-tracker
+name: duely
 
 services:
   db:

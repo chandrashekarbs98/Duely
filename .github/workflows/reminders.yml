@@ -2,7 +2,7 @@
 # protected endpoint, and the app emails each opted-in user their digest.
 #
 # Needs two repository secrets (Settings → Secrets and variables → Actions):
-#   APP_URL      e.g. https://personal-tracker.onrender.com
+#   APP_URL      e.g. https://duely.onrender.com
 #   CRON_SECRET  the same value as CRON_SECRET on Render
 name: Daily reminders
 

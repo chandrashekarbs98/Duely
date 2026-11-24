@@ -1,4 +1,4 @@
-# Deploying Personal Tracker
+# Deploying Duely
 
 Goal: the app running at a public HTTPS URL your friends can use, for free.
 
@@ -45,11 +45,11 @@ You create the accounts and paste secrets. Claude must not create accounts or ha
 passwords, so these steps are yours. Allow 30–45 minutes.
 
 ### 1. Push the code to GitHub
-1. Create an **empty** repository on github.com (e.g. `personal-tracker`). Public is fine (it's
+1. Create an **empty** repository on github.com (e.g. `duely`). Public is fine (it's
    a portfolio piece); `.env` is in `.gitignore`, so no secrets are pushed.
 2. In this folder:
    ```bash
-   git remote add origin https://github.com/<you>/personal-tracker.git
+   git remote add origin https://github.com/<you>/duely.git
    git push -u origin main
    ```
 3. Open the **Actions** tab: the **CI** workflow should go green.
@@ -69,13 +69,13 @@ passwords, so these steps are yours. Allow 30–45 minutes.
 ### 4. Create the web service (Render)
 1. Sign up at render.com with your GitHub account.
 2. **New → Blueprint** → pick the repository. Render reads `render.yaml` and proposes the
-   `personal-tracker` web service.
+   `duely` web service.
 3. Fill the values it asks for:
 
    | Variable | Value |
    |----------|-------|
    | `DATABASE_URL` | the Neon connection string |
-   | `APP_URL` | `https://personal-tracker.onrender.com` (use the URL Render shows you) |
+   | `APP_URL` | `https://duely.onrender.com` (use the URL Render shows you) |
    | `FRONTEND_ORIGIN` | same as `APP_URL` |
    | `CRON_SECRET` | a long random string: `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
    | `BREVO_API_KEY` | the Brevo API key |

@@ -1,4 +1,4 @@
-# Personal Tracker — Build Plan
+# Duely — Build Plan
 
 The phases below were built in order. Each one lists what was built and how "done" was checked.
 Use the same format for future phases.

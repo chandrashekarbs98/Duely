@@ -139,7 +139,7 @@ def create_app() -> FastAPI:
     # The interactive API docs are handy locally but just a map for attackers in production.
     show_docs = not settings.is_production
     app = FastAPI(
-        title="Personal Tracker API",
+        title="Duely API",
         version="1.0.0",
         description="Todos and personal finance, per user. Auth is a JWT in an httpOnly cookie.",
         docs_url="/docs" if show_docs else None,

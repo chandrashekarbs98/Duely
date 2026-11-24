@@ -47,8 +47,8 @@ class Settings(BaseSettings):
     # Reminders / email
     cron_secret: str | None = None
     email_provider: Literal["console", "smtp", "brevo"] = "console"
-    email_from_name: str = "Personal Tracker"
-    email_from_address: str = "reminders@tracker.local"
+    email_from_name: str = "Duely"
+    email_from_address: str = "reminders@duely.local"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

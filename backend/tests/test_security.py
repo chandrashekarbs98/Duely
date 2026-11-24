@@ -80,5 +80,5 @@ def test_production_hides_api_docs(production_app: TestClient) -> None:
     for path in ("/openapi.json", "/redoc"):
         response = production_app.get(path)
         # Falls through to the React app (index.html), not the API schema.
-        assert "Personal Tracker API" not in response.text
+        assert "Duely API" not in response.text
     assert "swagger" not in production_app.get("/docs").text.lower()

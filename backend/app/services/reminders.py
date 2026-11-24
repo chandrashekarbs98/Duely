@@ -128,11 +128,11 @@ class ReminderService:
             to_address=user.email,
             to_name=user.name,
             subject=f"Your reminders for {r.today:%d %b %Y}",
-            text=f"{greeting}\n\n{text}\n\nOpen your tracker: {link}\n",
+            text=f"{greeting}\n\n{text}\n\nOpen Duely: {link}\n",
             html=(
                 "<div style='font-family:system-ui,sans-serif;max-width:560px'>"
                 f"<p>{html.escape(greeting)}</p>{body_html}"
-                f"<p><a href='{html.escape(link)}'>Open your tracker</a></p></div>"
+                f"<p><a href='{html.escape(link)}'>Open Duely</a></p></div>"
             ),
         )
 

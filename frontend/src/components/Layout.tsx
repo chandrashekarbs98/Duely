@@ -29,7 +29,7 @@ export default function Layout() {
           <span className="brand-mark" aria-hidden="true">
             ✓
           </span>
-          Personal Tracker
+          Duely
         </div>
         <nav className="nav" aria-label="Main">
           {LINKS.map((link) => (

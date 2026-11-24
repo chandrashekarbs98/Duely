@@ -1,6 +1,6 @@
-# Personal Tracker
+# Duely
 
-To-dos and personal finance in one place: a full-stack web app built with **React + TypeScript**,
+Tasks and money, on time. To-dos, bills and reminders in one place: a full-stack web app built with **React + TypeScript**,
 **FastAPI**, **PostgreSQL** and **Docker**, deployed to the cloud.
 
 **Live demo:** _add your Render URL here after deploying_ · Demo login: _see docs/DEPLOY.md step 6_

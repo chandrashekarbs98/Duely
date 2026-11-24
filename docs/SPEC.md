@@ -1,4 +1,4 @@
-# Personal Tracker (Todo + Finance) — Spec
+# Duely (Todo + Finance) — Spec
 
 This is the source of truth for what gets built. If anything else disagrees with this file, this file wins.
 

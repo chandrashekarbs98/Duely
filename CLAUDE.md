@@ -1,4 +1,4 @@
-# CLAUDE.md — Personal Tracker
+# CLAUDE.md — Duely
 
 A public todo + finance web app. Learning and portfolio project: the owner studies the
 architecture from `docs/GUIDE.md` rather than typing the code.

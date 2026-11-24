@@ -11,9 +11,9 @@ function AuthCard({ title, children }: { title: string; children: React.ReactNod
           <span className="brand-mark" aria-hidden="true">
             ✓
           </span>
-          Personal Tracker
+          Duely
         </div>
-        <p className="muted">To-dos and money, in one place.</p>
+        <p className="muted">Tasks and money, on time.</p>
         <h1>{title}</h1>
         {children}
       </div>
